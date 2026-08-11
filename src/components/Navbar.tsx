@@ -158,6 +158,22 @@ export const Navbar: React.FC = () => {
               </span>
             </button>
 
+            {/* Distinctive Luxury Theme Switcher (Prominent on Mobile) */}
+            <button
+              onClick={toggleTheme}
+              className={`flex sm:hidden w-9 h-9 rounded-full items-center justify-center transition-all cursor-pointer relative active:scale-90 hover:scale-105 shadow-xs border ${
+                theme === 'dark'
+                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/25 shadow-[0_0_12px_rgba(212,175,55,0.3)]'
+                  : 'bg-neutral-900 border-neutral-700 text-amber-300 hover:bg-neutral-800 shadow-sm'
+              }`}
+              title={theme === 'dark' ? 'التبديل إلى الوضع النهاري' : 'التبديل إلى الوضع الليلي الملكي'}
+              aria-label="Toggle Theme Mobile"
+            >
+              <span className={`material-symbols-outlined text-lg transition-transform duration-300 ${theme === 'dark' ? 'rotate-0' : '-rotate-45'}`}>
+                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+              </span>
+            </button>
+
             {/* Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
@@ -168,10 +184,10 @@ export const Navbar: React.FC = () => {
               <span className="material-symbols-outlined text-xl sm:text-2xl">search</span>
             </button>
 
-            {/* Favorites / Wishlist */}
+            {/* Favorites / Wishlist (Desktop Only in Top Bar, Available in Drawer for Mobile) */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-neutral-800 dark:text-[#D4AF37] hover:bg-rose-50 dark:hover:bg-neutral-800/80 hover:text-rose-600 transition-all relative cursor-pointer active:scale-95 hover:scale-105"
+              className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full items-center justify-center text-neutral-800 dark:text-[#D4AF37] hover:bg-rose-50 dark:hover:bg-neutral-800/80 hover:text-rose-600 transition-all relative cursor-pointer active:scale-95 hover:scale-105"
               title={t.wishlist}
               aria-label="View Wishlist"
             >
