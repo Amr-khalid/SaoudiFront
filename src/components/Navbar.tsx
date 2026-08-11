@@ -27,6 +27,7 @@ export const Navbar: React.FC = () => {
     setIsProfileOpen,
     t,
     getWhatsAppLink,
+    isLoadingProducts,
   } = useApp();
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -90,43 +91,50 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Desktop Navigation Links with Bright Luxury Pills */}
-          <div className="hidden md:flex items-center space-x-1 lg:space-x-1.5 rtl:space-x-reverse bg-neutral-100/70 dark:bg-[#141414]/90 p-1 rounded-full border border-neutral-200/70 dark:border-neutral-800/90 backdrop-blur-md">
-            <Link
-              href="/"
-              className={`px-4 py-2 rounded-full text-xs font-button tracking-[0.2em] uppercase font-bold transition-all duration-300 ${
-                pathname === '/'
-                  ? 'bg-amber-100 text-amber-950 border border-amber-300/80 shadow-xs dark:bg-gradient-to-r dark:from-[#D4AF37] dark:via-[#E5C158] dark:to-[#D4AF37] dark:text-neutral-950 dark:border-transparent dark:shadow-md dark:shadow-[#D4AF37]/20 scale-105'
-                  : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-neutral-800/60'
-              }`}
-            >
-              {t.home || (lang === 'ar' ? 'الرئيسية' : 'Home')}
-            </Link>
-
-            <Link
-              href="/shop"
-              className={`px-4 py-2 rounded-full text-xs font-button tracking-[0.2em] uppercase font-bold transition-all duration-300 ${
-                pathname.startsWith('/shop')
-                  ? 'bg-amber-100 text-amber-950 border border-amber-300/80 shadow-xs dark:bg-gradient-to-r dark:from-[#D4AF37] dark:via-[#E5C158] dark:to-[#D4AF37] dark:text-neutral-950 dark:border-transparent dark:shadow-md dark:shadow-[#D4AF37]/20 scale-105'
-                  : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-neutral-800/60'
-              }`}
-            >
-              {t.shop || (lang === 'ar' ? 'الكتالوج' : 'Catalog')}
-            </Link>
-
-            {isAdmin && (
+          {isLoadingProducts ? (
+            <div className="hidden md:flex items-center space-x-2 rtl:space-x-reverse bg-neutral-100/70 dark:bg-[#141414]/90 p-1.5 rounded-full border border-neutral-200/70 dark:border-neutral-800/90 backdrop-blur-md">
+              <div className="w-20 h-7 rounded-full bg-neutral-200/80 dark:bg-neutral-800/80 luxury-skeleton animate-pulse" />
+              <div className="w-20 h-7 rounded-full bg-neutral-200/80 dark:bg-neutral-800/80 luxury-skeleton animate-pulse" />
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center space-x-1 lg:space-x-1.5 rtl:space-x-reverse bg-neutral-100/70 dark:bg-[#141414]/90 p-1 rounded-full border border-neutral-200/70 dark:border-neutral-800/90 backdrop-blur-md">
               <Link
-                href="/admin"
-                className={`px-4 py-2 rounded-full text-xs font-button tracking-[0.2em] uppercase font-bold transition-all duration-300 flex items-center gap-1.5 ${
-                  pathname.startsWith('/admin')
+                href="/"
+                className={`px-4 py-2 rounded-full text-xs font-button tracking-[0.2em] uppercase font-bold transition-all duration-300 ${
+                  pathname === '/'
                     ? 'bg-amber-100 text-amber-950 border border-amber-300/80 shadow-xs dark:bg-gradient-to-r dark:from-[#D4AF37] dark:via-[#E5C158] dark:to-[#D4AF37] dark:text-neutral-950 dark:border-transparent dark:shadow-md dark:shadow-[#D4AF37]/20 scale-105'
-                    : 'text-amber-800 dark:text-[#D4AF37] hover:bg-white/80 dark:hover:bg-neutral-800/60'
+                    : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-neutral-800/60'
                 }`}
               >
-                <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
-                <span>Admin</span>
+                {t.home || (lang === 'ar' ? 'الرئيسية' : 'Home')}
               </Link>
-            )}
-          </div>
+
+              <Link
+                href="/shop"
+                className={`px-4 py-2 rounded-full text-xs font-button tracking-[0.2em] uppercase font-bold transition-all duration-300 ${
+                  pathname.startsWith('/shop')
+                    ? 'bg-amber-100 text-amber-950 border border-amber-300/80 shadow-xs dark:bg-gradient-to-r dark:from-[#D4AF37] dark:via-[#E5C158] dark:to-[#D4AF37] dark:text-neutral-950 dark:border-transparent dark:shadow-md dark:shadow-[#D4AF37]/20 scale-105'
+                    : 'text-neutral-600 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white hover:bg-white/80 dark:hover:bg-neutral-800/60'
+                }`}
+              >
+                {t.shop || (lang === 'ar' ? 'الكتالوج' : 'Catalog')}
+              </Link>
+
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className={`px-4 py-2 rounded-full text-xs font-button tracking-[0.2em] uppercase font-bold transition-all duration-300 flex items-center gap-1.5 ${
+                    pathname.startsWith('/admin')
+                      ? 'bg-amber-100 text-amber-950 border border-amber-300/80 shadow-xs dark:bg-gradient-to-r dark:from-[#D4AF37] dark:via-[#E5C158] dark:to-[#D4AF37] dark:text-neutral-950 dark:border-transparent dark:shadow-md dark:shadow-[#D4AF37]/20 scale-105'
+                      : 'text-amber-800 dark:text-[#D4AF37] hover:bg-white/80 dark:hover:bg-neutral-800/60'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
+                  <span>Admin</span>
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* End Action Controls (Transparent by default in Light Mode) */}
           <div className="flex items-center space-x-1 sm:space-x-1.5 rtl:space-x-reverse">

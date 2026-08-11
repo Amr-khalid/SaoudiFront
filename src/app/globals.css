@@ -338,3 +338,35 @@
   letter-spacing: 0.04em !important;
 }
 
+/* Luxury Skeleton Shimmer */
+@keyframes luxuryShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.luxury-skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 175, 55, 0.12) 50%,
+    transparent 100%
+  );
+  animation: luxuryShimmer 2s infinite ease-in-out;
+}
+
