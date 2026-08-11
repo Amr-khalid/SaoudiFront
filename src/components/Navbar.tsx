@@ -353,7 +353,11 @@ export const Navbar: React.FC = () => {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    setIsProfileOpen(true);
+                    if (user) {
+                      setIsProfileOpen(true);
+                    } else {
+                      setIsAuthOpen(true);
+                    }
                   }}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors cursor-pointer ${
                     isDark

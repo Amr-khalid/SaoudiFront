@@ -16,7 +16,19 @@ const ORDER_STEPS = [
 ];
 
 export const CustomerProfileModal: React.FC = () => {
-  const { isProfileOpen, setIsProfileOpen, user, setUser, isAdmin, logout, showToast, theme, lang, getWhatsAppLink } = useApp();
+  const {
+    isProfileOpen,
+    setIsProfileOpen,
+    user,
+    setUser,
+    isAdmin,
+    logout,
+    showToast,
+    theme,
+    lang,
+    getWhatsAppLink,
+    setIsAuthOpen,
+  } = useApp();
   const [activeTab, setActiveTab] = useState<'orders' | 'track' | 'profile'>('orders');
   const [myOrders, setMyOrders] = useState<AdminOrder[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
@@ -45,6 +57,7 @@ export const CustomerProfileModal: React.FC = () => {
   }, [user]);
 
   const fetchCustomerOrders = () => {
+    if (!user) return;
     setLoadingOrders(true);
     api.getMyOrders().then((orders) => {
       if (orders && orders.length > 0) {
@@ -55,12 +68,85 @@ export const CustomerProfileModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isProfileOpen && activeTab === 'orders') {
+    if (isProfileOpen && activeTab === 'orders' && user) {
       fetchCustomerOrders();
     }
-  }, [isProfileOpen, activeTab]);
+  }, [isProfileOpen, activeTab, user]);
 
   if (!isProfileOpen) return null;
+
+  const isDark = theme === 'dark';
+
+  // Strict Authentication Guard: If user is not logged in, hide all order history and profile details
+  if (!user) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in dir-rtl">
+        <div
+          className={`max-w-md w-full p-6 sm:p-8 rounded-3xl border shadow-2xl relative space-y-6 text-center transition-colors duration-300 ${
+            isDark
+              ? 'bg-[#141414] border-[#262626] text-white'
+              : 'bg-white border-slate-200 text-slate-900 shadow-slate-200'
+          }`}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setIsProfileOpen(false)}
+            className={`absolute top-4 left-4 p-2 rounded-full transition-colors cursor-pointer ${
+              isDark
+                ? 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+            title="إغلاق"
+            aria-label="Close"
+          >
+            <span className="material-symbols-outlined text-2xl">close</span>
+          </button>
+
+          {/* Luxury Lock Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#D4AF37] flex items-center justify-center mx-auto shadow-md">
+            <span className="material-symbols-outlined text-3xl">lock</span>
+          </div>
+
+          {/* Heading and Description */}
+          <div className="space-y-2">
+            <h2 className="font-garamond text-2xl sm:text-3xl font-bold">
+              {lang === 'ar' ? 'سجل ومسار الطلبات الحية' : 'Track Order History'}
+            </h2>
+            <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-neutral-400' : 'text-slate-600'}`}>
+              {lang === 'ar'
+                ? 'يتطلب الوصول إلى سجل ومسار طلباتك الحية وتتبع الشحنات تسجيل الدخول أولاً بحسابك في SAOUDI WEAR.'
+                : 'Please sign in to your SAOUDI WEAR account to access and track your active orders and shipping history.'}
+            </p>
+          </div>
+
+          {/* Call to Action Buttons */}
+          <div className="space-y-3 pt-2">
+            <button
+              onClick={() => {
+                setIsProfileOpen(false);
+                setIsAuthOpen(true);
+              }}
+              className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] via-[#E5C158] to-[#D4AF37] text-neutral-950 font-button text-xs tracking-widest uppercase font-bold rounded-xl transition-all shadow-md hover:scale-[1.01] cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-lg">login</span>
+              <span>{lang === 'ar' ? 'تسجيل الدخول / إنشاء حساب جديد' : 'Sign In / Register'}</span>
+            </button>
+
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              className={`w-full py-3 border font-button text-xs tracking-widest uppercase rounded-xl transition-colors cursor-pointer font-bold ${
+                isDark
+                  ? 'border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
+                  : 'border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              {lang === 'ar' ? 'العودة للمتجر' : 'Back to Store'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleCopyOrderNumber = (orderNumber: string) => {
     navigator.clipboard.writeText(orderNumber);
