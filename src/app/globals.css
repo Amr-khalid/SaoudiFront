@@ -1,0 +1,340 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --color-background: #FFFFFF;
+    --color-surface: #F8F9FA;
+    --color-border: #E2E8F0;
+    --color-text-p: #0F172A;
+    --color-text-s: #475569;
+    --color-accent: #B8860B;
+    --color-accent-hover: #D4AF37;
+  }
+
+  .dark {
+    --color-background: #0A0A0A;
+    --color-surface: #141414;
+    --color-border: #262626;
+    --color-text-p: #E5E5E5;
+    --color-text-s: #A3A3A3;
+    --color-accent: #D4AF37;
+    --color-accent-hover: #E5C158;
+  }
+
+  body {
+    background-color: #FFFFFF;
+    color: #0F172A;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .dark body,
+  body.dark {
+    background-color: #0A0A0A;
+    color: #E5E5E5;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-garamond {
+    font-family: 'EB Garamond', serif;
+  }
+}
+
+/* Custom Typography Helpers */
+.font-display-lg {
+  font-family: 'EB Garamond', serif;
+  font-size: 64px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .font-display-lg {
+    font-size: 38px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+}
+
+.font-headline-lg {
+  font-family: 'EB Garamond', serif;
+  font-size: 32px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.font-headline-md {
+  font-family: 'EB Garamond', serif;
+  font-size: 24px;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  font-weight: 500;
+}
+
+.font-body-lg {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  font-weight: 300;
+}
+
+.font-body-md {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+}
+
+.font-label-caps {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+}
+
+.font-button {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+/* Glass & Glow utilities */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.dark .glass-nav {
+  background: rgba(10, 10, 10, 0.9);
+  border-bottom: 1px solid #262626;
+}
+
+.glass-panel {
+  background: #FFFFFF;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-panel {
+  background: #141414;
+  border: 1px solid #262626;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.ambient-shadow {
+  box-shadow: 0 12px 40px -10px rgba(212, 175, 55, 0.18);
+}
+
+.gold-glow {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.35);
+}
+
+.luxury-gradient-text {
+  background: linear-gradient(135deg, #B8860B 0%, #D4AF37 50%, #8C6D1F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .luxury-gradient-text {
+  background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #AA7C11 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(212, 175, 55, 0.8);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Material Symbols fill variant */
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Luxury Input */
+.input-luxury {
+  width: 100%;
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  padding: 0.85rem 1.1rem;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+  border-radius: 8px;
+}
+.dark .input-luxury {
+  background-color: #1D1D1D;
+  border: 1px solid #262626;
+  color: #E5E5E5;
+}
+.input-luxury:focus {
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+}
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseGold {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.08); }
+}
+.animate-gold-pulse {
+  animation: pulseGold 2.5s infinite ease-in-out;
+}
+
+/* LOGO TRANSPARENCY STYLES */
+.logo-img {
+  background-color: transparent !important;
+  object-fit: contain;
+}
+
+/* ARABIC / RTL TYPOGRAPHY */
+[dir="rtl"], [dir="rtl"] body {
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
+}
+
+[dir="rtl"] .font-garamond,
+[dir="rtl"] .font-display-lg,
+[dir="rtl"] .font-headline-lg,
+[dir="rtl"] .font-headline-md {
+  font-family: 'Cairo', 'EB Garamond', serif !important;
+  letter-spacing: 0 !important;
+}
+
+/* ULTRA-LUXURY SOFT GOLD SHINE & METALLIC SHIMMER */
+@keyframes luxuryGoldShine {
+  0% {
+    background-position: 200% center;
+  }
+  15% {
+    background-position: 200% center;
+  }
+  80% {
+    background-position: -80% center;
+  }
+  100% {
+    background-position: -80% center;
+  }
+}
+
+.gold-shine-text {
+  font-family: 'EB Garamond', serif !important;
+  background: linear-gradient(
+    115deg,
+    #96701B 0%,
+    #BA8B28 20%,
+    #DCB34C 35%,
+    #FFF2BA 50%,
+    #DCB34C 65%,
+    #BA8B28 80%,
+    #96701B 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #BA8B28;
+  animation: luxuryGoldShine 6.5s cubic-bezier(0.45, 0.05, 0.25, 0.95) infinite;
+  display: inline-block;
+  letter-spacing: 0.2em !important;
+  filter: drop-shadow(0 1px 1px rgba(150, 112, 27, 0.25));
+  transition: filter 0.4s ease, transform 0.3s ease;
+}
+
+.gold-shine-text:hover {
+  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.45));
+}
+
+.dark .gold-shine-text {
+  background: linear-gradient(
+    115deg,
+    #A67E1E 0%,
+    #D4AF37 20%,
+    #E8C55E 35%,
+    #FFF8D6 50%,
+    #E8C55E 65%,
+    #D4AF37 80%,
+    #A67E1E 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #E8C55E;
+  animation: luxuryGoldShine 6.5s cubic-bezier(0.45, 0.05, 0.25, 0.95) infinite;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.35));
+}
+
+.dark .gold-shine-text:hover {
+  filter: drop-shadow(0 0 16px rgba(212, 175, 55, 0.6));
+}
+
+[dir="rtl"] .font-label-caps,
+[dir="rtl"] .font-button {
+  letter-spacing: 0.04em !important;
+}
+
