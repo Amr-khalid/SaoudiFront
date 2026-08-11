@@ -97,15 +97,15 @@ export const HomepageManagement: React.FC = () => {
     setHomepage((prev: any) => ({
       ...prev,
       heroSlider: [
-        ...prev.heroSlider,
+        ...(prev.heroSlider || []),
         {
-          title: 'عنوان السلايد الرئيسي',
-          subtitle: 'الوصف الفرعي',
+          title: '',
+          subtitle: '',
           image: {
-            url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80',
+            url: '',
           },
-          link: '/shop',
-          sortOrder: prev.heroSlider.length + 1,
+          link: '',
+          sortOrder: (prev.heroSlider?.length || 0) + 1,
         },
       ],
     }));
@@ -114,15 +114,21 @@ export const HomepageManagement: React.FC = () => {
   const handleRemoveHeroSlide = (index: number) => {
     setHomepage((prev: any) => ({
       ...prev,
-      heroSlider: prev.heroSlider.filter((_: any, i: number) => i !== index),
+      heroSlider: (prev.heroSlider || []).filter((_: any, i: number) => i !== index),
     }));
   };
 
   const handleHeroSlideChange = (index: number, field: string, value: any) => {
     setHomepage((prev: any) => {
-      const updated = [...prev.heroSlider];
+      const updated = [...(prev.heroSlider || [])];
       if (field === 'imageUrl') {
-        updated[index] = { ...updated[index], image: { ...updated[index].image, url: value } };
+        const currentImg = updated[index]?.image;
+        updated[index] = {
+          ...updated[index],
+          image: typeof currentImg === 'object' && currentImg !== null
+            ? { ...currentImg, url: value }
+            : { url: value },
+        };
       } else {
         updated[index] = { ...updated[index], [field]: value };
       }
@@ -147,19 +153,19 @@ export const HomepageManagement: React.FC = () => {
     setHomepage((prev: any) => ({
       ...prev,
       offers: [
-        ...prev.offers,
+        ...(prev.offers || []),
         {
-          title: 'عرض جديد',
-          subtitle: 'عروض موسمية',
-          description: 'تفاصيل العرض الترويجي والخصم على هذه المجموعة الفاخرة.',
+          title: '',
+          subtitle: '',
+          description: '',
           image: {
-            url: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1000&q=80',
+            url: '',
           },
-          discountPercentage: 20,
-          badgeText: 'خصم 20%',
-          link: '/shop',
+          discountPercentage: '',
+          badgeText: '',
+          link: '',
           isActive: true,
-          sortOrder: prev.offers.length + 1,
+          sortOrder: (prev.offers?.length || 0) + 1,
         },
       ],
     }));
@@ -168,15 +174,23 @@ export const HomepageManagement: React.FC = () => {
   const handleRemoveOffer = (index: number) => {
     setHomepage((prev: any) => ({
       ...prev,
-      offers: prev.offers.filter((_: any, i: number) => i !== index),
+      offers: (prev.offers || []).filter((_: any, i: number) => i !== index),
     }));
   };
 
   const handleOfferChange = (index: number, field: string, value: any) => {
     setHomepage((prev: any) => {
-      const updated = [...prev.offers];
+      const updated = [...(prev.offers || [])];
       if (field === 'imageUrl') {
-        updated[index] = { ...updated[index], image: { ...updated[index].image, url: value } };
+        const currentImg = updated[index]?.image;
+        updated[index] = {
+          ...updated[index],
+          image: typeof currentImg === 'object' && currentImg !== null
+            ? { ...currentImg, url: value }
+            : { url: value },
+        };
+      } else if (field === 'discountPercentage') {
+        updated[index] = { ...updated[index], discountPercentage: value === '' ? '' : Number(value) };
       } else {
         updated[index] = { ...updated[index], [field]: value };
       }
@@ -223,13 +237,13 @@ export const HomepageManagement: React.FC = () => {
       bentoCollections: [
         ...(prev.bentoCollections || []),
         {
-          title: 'اسم المجموعة الجديدة',
-          subtitle: 'تصنيف فاخر',
-          description: 'وصف مختصر للمجموعة أو المنتجات المعروضة.',
+          title: '',
+          subtitle: '',
+          description: '',
           image: {
-            url: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1000&q=80',
+            url: '',
           },
-          link: '/shop',
+          link: '',
           colSpan: 6,
           height: '460px',
           sortOrder: (prev.bentoCollections?.length || 0) + 1,
@@ -241,7 +255,7 @@ export const HomepageManagement: React.FC = () => {
   const handleRemoveBentoCollection = (index: number) => {
     setHomepage((prev: any) => ({
       ...prev,
-      bentoCollections: prev.bentoCollections.filter((_: any, i: number) => i !== index),
+      bentoCollections: (prev.bentoCollections || []).filter((_: any, i: number) => i !== index),
     }));
   };
 
@@ -249,7 +263,13 @@ export const HomepageManagement: React.FC = () => {
     setHomepage((prev: any) => {
       const updated = [...(prev.bentoCollections || [])];
       if (field === 'imageUrl') {
-        updated[index] = { ...updated[index], image: { ...updated[index].image, url: value } };
+        const currentImg = updated[index]?.image;
+        updated[index] = {
+          ...updated[index],
+          image: typeof currentImg === 'object' && currentImg !== null
+            ? { ...currentImg, url: value }
+            : { url: value },
+        };
       } else {
         updated[index] = { ...updated[index], [field]: value };
       }
@@ -593,6 +613,7 @@ export const HomepageManagement: React.FC = () => {
                       value={slide.title || ''}
                       onChange={(e) => handleHeroSlideChange(idx, 'title', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="أدخل عنوان الشريحة..."
                     />
                   </div>
 
@@ -605,6 +626,7 @@ export const HomepageManagement: React.FC = () => {
                       value={slide.subtitle || ''}
                       onChange={(e) => handleHeroSlideChange(idx, 'subtitle', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="أدخل الوصف الفرعي للشريحة..."
                     />
                   </div>
 
@@ -615,10 +637,10 @@ export const HomepageManagement: React.FC = () => {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        value={slide.image?.url || slide.image || ''}
+                        value={slide.image?.url || (typeof slide.image === 'string' ? slide.image : '') || ''}
                         onChange={(e) => handleHeroSlideChange(idx, 'imageUrl', e.target.value)}
                         className="flex-1 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                        placeholder="https://..."
+                        placeholder="رابط الصورة https://..."
                       />
                       <label className="px-3.5 py-2 bg-neutral-950 dark:bg-neutral-800 text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#D4AF37] hover:text-neutral-950 transition-colors flex items-center gap-1">
                         <span className="material-symbols-outlined text-sm">upload</span>
@@ -649,7 +671,7 @@ export const HomepageManagement: React.FC = () => {
                       value={slide.link || ''}
                       onChange={(e) => handleHeroSlideChange(idx, 'link', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                      placeholder="/shop"
+                      placeholder="رابط التوجيه (مثال: /shop)..."
                     />
                   </div>
                 </div>
@@ -722,6 +744,7 @@ export const HomepageManagement: React.FC = () => {
                       value={offer.title || ''}
                       onChange={(e) => handleOfferChange(idx, 'title', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="أدخل عنوان العرض..."
                     />
                   </div>
 
@@ -734,6 +757,7 @@ export const HomepageManagement: React.FC = () => {
                       value={offer.subtitle || ''}
                       onChange={(e) => handleOfferChange(idx, 'subtitle', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="أدخل العنوان الفرعي..."
                     />
                   </div>
 
@@ -743,11 +767,12 @@ export const HomepageManagement: React.FC = () => {
                     </label>
                     <input
                       type="number"
-                      value={offer.discountPercentage || 0}
+                      value={offer.discountPercentage !== undefined && offer.discountPercentage !== null && offer.discountPercentage !== 0 ? offer.discountPercentage : ''}
                       onChange={(e) =>
-                        handleOfferChange(idx, 'discountPercentage', Number(e.target.value))
+                        handleOfferChange(idx, 'discountPercentage', e.target.value)
                       }
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="نسبة الخصم (مثال: 20)..."
                     />
                   </div>
 
@@ -760,6 +785,7 @@ export const HomepageManagement: React.FC = () => {
                       value={offer.description || ''}
                       onChange={(e) => handleOfferChange(idx, 'description', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="تفاصيل ووصف العرض..."
                     />
                   </div>
 
@@ -772,7 +798,7 @@ export const HomepageManagement: React.FC = () => {
                       value={offer.badgeText || ''}
                       onChange={(e) => handleOfferChange(idx, 'badgeText', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                      placeholder="خصم 40% لفترة محدودة"
+                      placeholder="نص الشارة (مثال: خصم 20%)..."
                     />
                   </div>
 
@@ -783,10 +809,10 @@ export const HomepageManagement: React.FC = () => {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        value={offer.image?.url || offer.image || ''}
+                        value={offer.image?.url || (typeof offer.image === 'string' ? offer.image : '') || ''}
                         onChange={(e) => handleOfferChange(idx, 'imageUrl', e.target.value)}
                         className="flex-1 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                        placeholder="https://..."
+                        placeholder="رابط الصورة https://..."
                       />
                       <label className="px-3.5 py-2 bg-neutral-950 dark:bg-neutral-800 text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#D4AF37] hover:text-neutral-950 transition-colors flex items-center gap-1">
                         <span className="material-symbols-outlined text-sm">upload</span>
@@ -817,7 +843,7 @@ export const HomepageManagement: React.FC = () => {
                       value={offer.link || ''}
                       onChange={(e) => handleOfferChange(idx, 'link', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                      placeholder="/shop"
+                      placeholder="رابط التوجيه (مثال: /shop)..."
                     />
                   </div>
 
@@ -906,6 +932,7 @@ export const HomepageManagement: React.FC = () => {
                       value={col.title || ''}
                       onChange={(e) => handleBentoCollectionChange(idx, 'title', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="اسم المجموعة..."
                     />
                   </div>
 
@@ -918,6 +945,7 @@ export const HomepageManagement: React.FC = () => {
                       value={col.subtitle || ''}
                       onChange={(e) => handleBentoCollectionChange(idx, 'subtitle', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="العنوان الفرعي..."
                     />
                   </div>
 
@@ -950,6 +978,7 @@ export const HomepageManagement: React.FC = () => {
                         handleBentoCollectionChange(idx, 'description', e.target.value)
                       }
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
+                      placeholder="وصف المجموعة..."
                     />
                   </div>
 
@@ -962,7 +991,7 @@ export const HomepageManagement: React.FC = () => {
                       value={col.link || ''}
                       onChange={(e) => handleBentoCollectionChange(idx, 'link', e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                      placeholder="/shop"
+                      placeholder="رابط التوجيه (مثال: /shop)..."
                     />
                   </div>
 
@@ -973,10 +1002,10 @@ export const HomepageManagement: React.FC = () => {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        value={col.image?.url || col.image || ''}
+                        value={col.image?.url || (typeof col.image === 'string' ? col.image : '') || ''}
                         onChange={(e) => handleBentoCollectionChange(idx, 'imageUrl', e.target.value)}
                         className="flex-1 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                        placeholder="https://..."
+                        placeholder="رابط الصورة https://..."
                       />
                       <label className="px-4 py-2 bg-neutral-950 dark:bg-neutral-800 text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#D4AF37] hover:text-neutral-950 transition-colors flex items-center gap-1">
                         <span className="material-symbols-outlined text-sm">upload</span>
@@ -1048,7 +1077,7 @@ export const HomepageManagement: React.FC = () => {
                 type="text"
                 value={homepage.heritage?.subtitle || ''}
                 onChange={(e) => handleHeritageChange('subtitle', e.target.value)}
-                placeholder="ATELIER HERITAGE"
+                placeholder="العنوان الفرعي (مثال: إرث الأتليه)..."
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
               />
             </div>
@@ -1061,7 +1090,7 @@ export const HomepageManagement: React.FC = () => {
                 type="text"
                 value={homepage.heritage?.title || ''}
                 onChange={(e) => handleHeritageChange('title', e.target.value)}
-                placeholder="Uncompromising Craftsmanship"
+                placeholder="العنوان الرئيسي..."
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
               />
             </div>
@@ -1086,9 +1115,9 @@ export const HomepageManagement: React.FC = () => {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={homepage.heritage?.image?.url || homepage.heritage?.image || ''}
+                  value={homepage.heritage?.image?.url || (typeof homepage.heritage?.image === 'string' ? homepage.heritage?.image : '') || ''}
                   onChange={(e) => handleHeritageChange('image', { url: e.target.value })}
-                  placeholder="https://..."
+                  placeholder="رابط الصورة https://..."
                   className="flex-1 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
                 />
                 <label className="px-4 py-2 bg-neutral-950 dark:bg-neutral-800 text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#D4AF37] hover:text-neutral-950 transition-colors flex items-center gap-1">
@@ -1119,7 +1148,7 @@ export const HomepageManagement: React.FC = () => {
                 type="text"
                 value={homepage.heritage?.link || ''}
                 onChange={(e) => handleHeritageChange('link', e.target.value)}
-                placeholder="/shop"
+                placeholder="رابط التوجيه (مثال: /shop)..."
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
               />
             </div>
@@ -1149,7 +1178,7 @@ export const HomepageManagement: React.FC = () => {
                   }))
                 }
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs text-neutral-900 dark:text-white focus:border-[#9A7B1C] outline-none"
-                placeholder="FLASH SALE - عروض خاطفة"
+                placeholder="عنوان الفلاش سيل..."
               />
             </div>
 
