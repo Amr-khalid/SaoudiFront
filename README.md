@@ -20,7 +20,7 @@
 [![Vercel Deployment](https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-D4AF37?style=for-the-badge)](LICENSE)
 
-[🌐 Live Storefront](https://saoudi-wear.vercel.app) • [🔌 Backend Repository](https://github.com/Amr-khalid/SaoudiBackend) • [📖 Documentation](#-table-of-contents)
+[🌐 Live Storefront](https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app/) • [🔌 Backend Repository](https://github.com/Amr-khalid/SaoudiBackend) • [📖 Documentation](#-table-of-contents)
 
 </div>
 
@@ -192,7 +192,7 @@ NEXT_PUBLIC_API_URL=https://saoudi-backend.vercel.app/api
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Visit [https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app/](https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app/) or `http://localhost:3000` in your browser.
 
 ---
 

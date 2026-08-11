@@ -429,7 +429,20 @@ export const CheckoutView: React.FC = () => {
           <div className="pt-2 space-y-3">
             <a
               href={getWhatsAppLink(
-                `مرحباً SAOUDI WEAR ATELIER 💎\n\nأود تأكيد طلبي المسجل في الموقع برقم: *${orderId}*\n👤 اسم العميل: ${completedOrderDetails.customerName}\n📞 رقم الجوال: ${completedOrderDetails.phone}\n📍 المدينة والعنوان: ${completedOrderDetails.city} - ${completedOrderDetails.address}\n💰 المبلغ الإجمالي: $${completedOrderDetails.totalUSD.toLocaleString()} USD\n\nيرجى بدء التجهيز والشحن!`
+                `👑 *SAOUDI WEAR | الأتيليه الملكي*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━\n` +
+                `✅ *توثيق وتأكيد طلب شراء معتمد*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `🔖 *رقم الطلب:* *${orderId}*\n` +
+                `👤 *اسم العميل:* ${completedOrderDetails.customerName}\n` +
+                `📞 *رقم الجوال:* ${completedOrderDetails.phone}\n` +
+                `📍 *المدينة والعنوان:* ${completedOrderDetails.city} - ${completedOrderDetails.address}\n` +
+                `💰 *المبلغ الإجمالي:* $${completedOrderDetails.totalUSD.toLocaleString()} USD (≈ ${completedOrderDetails.totalSAR.toLocaleString()} ر.س)\n\n` +
+                (completedOrderDetails.notes ? `📝 *ملاحظات العميل:* ${completedOrderDetails.notes}\n\n` : '') +
+                `🔗 *المتجر:* https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app\n` +
+                `━━━━━━━━━━━━━━━━━━━━━\n` +
+                `🚀 *يرجى بدء التجهيز والشحن وتزويدي برقم بوليصة التتبع الملكي!*\n` +
+                `شكراً لاختياركم SAOUDI WEAR! 🌟`
               )}
               target="_blank"
               rel="noopener noreferrer"

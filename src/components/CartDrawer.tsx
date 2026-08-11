@@ -43,6 +43,7 @@ export const CartDrawer: React.FC = () => {
 
   // WhatsApp VIP Direct Cart Order
   const handleWhatsAppCheckout = () => {
+    const defaultSiteUrl = 'https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app';
     const itemsSummary = cartItems
       .map((item, idx) => {
         const hasSize = Boolean(
@@ -55,14 +56,31 @@ export const CartDrawer: React.FC = () => {
           item.selectedFinish !== 'الافتراضي' &&
           item.selectedFinish !== 'Default'
         );
-        const sizeLine = hasSize ? `\n   - المقاس: ${item.selectedSize}` : '';
-        const colorLine = hasColor ? `\n   - اللون: ${item.selectedFinish}` : '';
+        const sizeLine = hasSize ? ` | مقاس: ${item.selectedSize}` : '';
+        const colorLine = hasColor ? ` | لون: ${item.selectedFinish}` : '';
+        const pTotalUSD = (item.product.price || 0) * item.quantity;
+        const pTotalSAR = Math.round(pTotalUSD * 3.75);
 
-        return `${idx + 1}. ${item.product.name}${sizeLine}${colorLine}\n   - الكمية: ${item.quantity}\n   - السعر: $${((item.product.price || 0) * item.quantity).toLocaleString()} USD`;
+        return `${idx + 1}️⃣ *${item.product.name}*\n   ▫ الكمية: ${item.quantity}${sizeLine}${colorLine}\n   ▫ السعر: $${pTotalUSD.toLocaleString()} USD (≈ ${pTotalSAR.toLocaleString()} ر.س)`;
       })
       .join('\n\n');
 
-    const messageText = `مرحباً SAOUDI WEAR ATELIER 💎\nأود إتمام وتأكيد طلبي الملكي عبر الواتساب للقطع التالية:\n\n${itemsSummary}\n\n━━━━━━━━━━━━━━━\n💰 المجموع الإجمالي: $${subtotalUSD.toLocaleString()} USD (≈ ${subtotalSAR.toLocaleString()} ر.س)\n\nيرجى تزويدي بتفاصيل الشحن وتأكيد الطلب!`;
+    const messageText =
+      `👑 *SAOUDI WEAR | الأتيليه الملكي*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━\n` +
+      `🛍️ *طلب مقتنيات الحقيبة الملكية (VIP Cart Order)*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `📋 *جدول القطع المختارة:*\n` +
+      `${itemsSummary}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💰 *المجموع الإجمالي المطلوب:*\n` +
+      `▪ $${subtotalUSD.toLocaleString()} USD\n` +
+      `▪ ≈ ${subtotalSAR.toLocaleString()} ريال سعودي\n` +
+      `🚚 *الشحن:* شحن جوي سريع مجاني متضمن\n\n` +
+      `🔗 *رابط المتجر:* ${defaultSiteUrl}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📍 *يرجى حجز القطع والتواصل معي لتأكيد عنوان التوصيل الملكي.*\n` +
+      `شكراً لاختياركم SAOUDI WEAR! 🌟`;
 
     const whatsappUrl = getWhatsAppLink(messageText);
     if (typeof window !== 'undefined') {

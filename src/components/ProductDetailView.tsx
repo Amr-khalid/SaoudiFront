@@ -356,14 +356,18 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 
   // Open WhatsApp Direct Order with Product Details, Photo, Color & Size
   const handleWhatsAppOrder = () => {
-    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const defaultSiteUrl = 'https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app';
+    const currentUrl = typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost')
+      ? window.location.href
+      : `${defaultSiteUrl}/product/${currentId}`;
+
     const hasColor = Boolean(
       selectedColor &&
       selectedColor !== 'الافتراضي' &&
       product.colors &&
       product.colors.length > 0
     );
-    const colorLine = hasColor ? `🎨 اللون: ${selectedColor}\n` : '';
+    const colorLine = hasColor ? `▪ *اللون / الإصدار:* ${selectedColor}\n` : '';
 
     const hasSizesConfigured = Boolean(
       (product.sizes && product.sizes.length > 0) ||
@@ -371,13 +375,44 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
     );
     const sizeLine = hasSizesConfigured && selectedSize && selectedSize !== 'الافتراضي'
       ? isOutOfStock
-        ? `📐 المقاس المطلوب: ${selectedSize} (المقاس نفد حالياً)\n`
-        : `📐 المقاس: ${selectedSize}\n`
+        ? `▪ *المقاس المطلوب:* ${selectedSize} ⚠️ _(نفد مؤقتاً من المستودع)_\n`
+        : `▪ *المقاس المحدد:* ${selectedSize}\n`
       : '';
 
+    const totalUSD = priceUSD * quantity;
+    const totalSAR = Math.round(totalUSD * 3.75);
+
     const messageText = isOutOfStock
-      ? `مرحباً SAOUDI WEAR ATELIER 💎\nأود الاستفسار عن إمكانية طلب تفصيل خاص (Bespoke) للقطعة التالية بمقاس غير متوفر في المستودع:\n\n📌 اسم القطعة: ${product.name}\n💰 السعر: $${priceUSD.toLocaleString()} USD (≈ ${sarPrice.toLocaleString()} ر.س)\n${colorLine}${sizeLine}🔢 الكمية: ${quantity}\n🖼️ الصورة: ${activeMainImage || product.image}\n🔗 الرابط: ${currentUrl}\n\nيرجى إفادتي بإمكانية تصنيع أو توفير هذا المقاس والوقت المتوقع للتسليم!`
-      : `مرحباً SAOUDI WEAR ATELIER 💎\nأود طلب واستفسار عن القطعة الفاخرة التالية:\n\n📌 اسم القطعة: ${product.name}\n💰 السعر: $${priceUSD.toLocaleString()} USD (≈ ${sarPrice.toLocaleString()} ر.س)\n${colorLine}${sizeLine}🔢 الكمية: ${quantity}\n🖼️ الصورة: ${activeMainImage || product.image}\n🔗 الرابط: ${currentUrl}\n\nيرجى التواصل معي لتأكيد تفاصيل الشحن والتوصيل الملكي!`;
+      ? `👑 *SAOUDI WEAR | الأتيليه الملكي*\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🧵 *طلب تفصيل ملكي خاص (Bespoke Inquiry)*\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `💎 *تفاصيل القطعة المطلوبة:*\n` +
+        `▪ *الاسم:* ${product.name}\n` +
+        (product.category ? `▪ *القسم:* ${product.category}\n` : '') +
+        `${colorLine}${sizeLine}` +
+        `▪ *الكمية:* ${quantity} قطعة\n` +
+        `▪ *السعر التقديري:* $${totalUSD.toLocaleString()} USD (≈ ${totalSAR.toLocaleString()} ر.س)\n\n` +
+        `🔗 *رابط القطعة بالمتجر:*\n${currentUrl}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📍 *أود الاستفسار عن إمكانية حياكة وتوفير هذا المقاس خصيصاً لي والوقت المتوقع للتسليم.*\n` +
+        `شاكرين لكم اهتمامكم الفائق! 🌟`
+      : `👑 *SAOUDI WEAR | الأتيليه الملكي*\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n` +
+        `✨ *طلب شراء سريع ومباشر (VIP Quick Order)*\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `💎 *تفاصيل القطعة الفاخرة:*\n` +
+        `▪ *الاسم:* ${product.name}\n` +
+        (product.category ? `▪ *القسم:* ${product.category}\n` : '') +
+        `${colorLine}${sizeLine}` +
+        `▪ *الكمية:* ${quantity} قطعة\n\n` +
+        `💰 *القيمة الإجمالية:*\n` +
+        `▪ $${totalUSD.toLocaleString()} USD\n` +
+        `▪ ≈ ${totalSAR.toLocaleString()} ريال سعودي\n\n` +
+        `🔗 *رابط القطعة بالمتجر:*\n${currentUrl}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📍 *يرجى تأكيد استلام الطلب وتزويدي ببيانات الشحن والتوصيل الملكي.*\n` +
+        `شكراً لاختياركم SAOUDI WEAR! 🌟`;
 
     const whatsappUrl = getWhatsAppLink(messageText);
     if (typeof window !== 'undefined') {

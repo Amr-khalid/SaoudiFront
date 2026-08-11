@@ -14,6 +14,7 @@ export const QuickViewModal: React.FC = () => {
     addToCart,
     lang,
     t,
+    getWhatsAppLink,
   } = useApp();
 
   // Increment backend view count when quick view opens
@@ -89,25 +90,63 @@ export const QuickViewModal: React.FC = () => {
             </p>
           </div>
 
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-2">
+            {/* Primary Add to Bag */}
             <button
               onClick={() => {
                 addToCart(quickViewProduct);
                 setQuickViewProduct(null);
               }}
-              className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-neutral-950 hover:brightness-110 font-button text-xs tracking-widest uppercase font-bold transition-all cursor-pointer rounded-lg shadow-md hover:shadow-xl"
+              className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-neutral-950 hover:brightness-110 font-button text-xs tracking-widest uppercase font-bold transition-all cursor-pointer rounded-xl shadow-md hover:shadow-xl flex items-center justify-center gap-2"
             >
-              {lang === 'ar' ? 'إضافة إلى حقيبة التسوق' : 'Add to Shopping Bag'}
+              <span className="material-symbols-outlined text-lg">shopping_bag</span>
+              <span>{lang === 'ar' ? 'إضافة إلى حقيبة التسوق' : 'Add to Shopping Bag'}</span>
             </button>
+
+            {/* Direct Quick WhatsApp Order Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const defaultSiteUrl = 'https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app';
+                const pUrl = `${defaultSiteUrl}/product/${quickViewProduct.id}`;
+                const pSarPrice = Math.round((quickViewProduct.price || 0) * 3.75);
+                const msg =
+                  `👑 *SAOUDI WEAR | الأتيليه الملكي*\n` +
+                  `━━━━━━━━━━━━━━━━━━━━━\n` +
+                  `✨ *طلب شراء سريع ومباشر (VIP Quick Order)*\n` +
+                  `━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                  `💎 *تفاصيل القطعة الفاخرة:*\n` +
+                  `▪ *الاسم:* ${quickViewProduct.name}\n` +
+                  (quickViewProduct.category ? `▪ *القسم:* ${quickViewProduct.category}\n` : '') +
+                  `▪ *الكمية:* 1 قطعة\n\n` +
+                  `💰 *القيمة:* $${quickViewProduct.price.toLocaleString()} USD (≈ ${pSarPrice.toLocaleString()} ر.س)\n\n` +
+                  `🔗 *رابط القطعة بالمتجر:*\n${pUrl}\n\n` +
+                  `━━━━━━━━━━━━━━━━━━━━━\n` +
+                  `📍 *يرجى تأكيد استلام الطلب وتزويدي ببيانات الشحن والتوصيل الملكي.*\n` +
+                  `شكراً لاختياركم SAOUDI WEAR! 🌟`;
+
+                const waUrl = getWhatsAppLink(msg);
+                if (typeof window !== 'undefined') {
+                  window.open(waUrl, '_blank', 'noopener,noreferrer');
+                }
+              }}
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-button text-xs tracking-wider uppercase font-bold transition-all cursor-pointer rounded-xl shadow-md flex items-center justify-center gap-2 border border-emerald-400/30 group"
+            >
+              <span className="material-symbols-outlined text-base group-hover:scale-110 transition-transform">chat</span>
+              <span>{lang === 'ar' ? 'طلب فوري ومباشر عبر الواتساب (VIP)' : 'Instant VIP WhatsApp Order'}</span>
+            </button>
+
+            {/* View Full Product Link */}
             <button
               onClick={() => {
                 const prodId = quickViewProduct.id;
                 setQuickViewProduct(null);
                 router.push(`/product/${prodId}`);
               }}
-              className="w-full py-3.5 border border-neutral-300 dark:border-[#262626] text-[#B8860B] dark:text-[#D4AF37] hover:bg-[#D4AF37]/10 font-button text-xs tracking-widest uppercase transition-colors cursor-pointer rounded-lg font-bold"
+              className="w-full py-2.5 border border-neutral-300 dark:border-[#262626] text-[#B8860B] dark:text-[#D4AF37] hover:bg-[#D4AF37]/10 font-button text-xs tracking-widest uppercase transition-colors cursor-pointer rounded-xl font-bold flex items-center justify-center gap-1.5"
             >
-              {lang === 'ar' ? 'عرض التفاصيل والمواصفات الكاملة' : 'View Full Specifications'}
+              <span>{lang === 'ar' ? 'عرض التفاصيل والمواصفات الكاملة' : 'View Full Specifications'}</span>
+              <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
             </button>
           </div>
         </div>
