@@ -439,7 +439,7 @@ export const CheckoutView: React.FC = () => {
                 `📍 *المدينة والعنوان:* ${completedOrderDetails.city} - ${completedOrderDetails.address}\n` +
                 `💰 *المبلغ الإجمالي:* $${completedOrderDetails.totalUSD.toLocaleString()} USD (≈ ${completedOrderDetails.totalSAR.toLocaleString()} ر.س)\n\n` +
                 (completedOrderDetails.notes ? `📝 *ملاحظات العميل:* ${completedOrderDetails.notes}\n\n` : '') +
-                `🔗 *المتجر:* https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app\n` +
+                `🔗 *المتجر:* https://saoudi-front.vercel.app\n` +
                 `━━━━━━━━━━━━━━━━━━━━━\n` +
                 `🚀 *يرجى بدء التجهيز والشحن وتزويدي برقم بوليصة التتبع الملكي!*\n` +
                 `شكراً لاختياركم SAOUDI WEAR! 🌟`

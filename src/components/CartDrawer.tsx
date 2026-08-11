@@ -43,7 +43,7 @@ export const CartDrawer: React.FC = () => {
 
   // WhatsApp VIP Direct Cart Order
   const handleWhatsAppCheckout = () => {
-    const defaultSiteUrl = 'https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app';
+    const defaultSiteUrl = 'https://saoudi-front.vercel.app';
     const itemsSummary = cartItems
       .map((item, idx) => {
         const hasSize = Boolean(

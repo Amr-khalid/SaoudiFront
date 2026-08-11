@@ -356,7 +356,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 
   // Open WhatsApp Direct Order with Product Details, Photo, Color & Size
   const handleWhatsAppOrder = () => {
-    const defaultSiteUrl = 'https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app';
+    const defaultSiteUrl = 'https://saoudi-front.vercel.app';
     const currentUrl = typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost')
       ? window.location.href
       : `${defaultSiteUrl}/product/${currentId}`;

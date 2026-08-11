@@ -107,7 +107,7 @@ export const QuickViewModal: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                const defaultSiteUrl = 'https://saoudi-front-dkiy0pqmc-ame-khalids-projects.vercel.app';
+                const defaultSiteUrl = 'https://saoudi-front.vercel.app';
                 const pUrl = `${defaultSiteUrl}/product/${quickViewProduct.id}`;
                 const pSarPrice = Math.round((quickViewProduct.price || 0) * 3.75);
                 const msg =
