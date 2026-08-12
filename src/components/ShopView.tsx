@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Product, FilterState } from '../types';
 import { ImageZoomModal } from './ImageZoomModal';
+import { ProductImageSwiper } from './ui/ProductImageSwiper';
 import { useApp } from '../context/AppContext';
 import { api } from '../lib/api';
 
@@ -764,16 +765,15 @@ export const ShopView: React.FC = () => {
               const priceUSD = product.price || 0;
               const priceSAR = Math.round(priceUSD * 3.75);
 
-              // Collect all images for in-card flipping
+              // Collect all images for in-card swiping
               const productImagesList: string[] = [
                 product.image,
                 ...(product.secondaryImages || []),
                 ...((product as any).images || []).map((img: any) => typeof img === 'string' ? img : img?.url),
-              ].filter(Boolean);
+                ...(product.colors || []).map((c: any) => c?.image),
+              ].filter((img): img is string => typeof img === 'string' && img.trim() !== '');
 
               const uniqueImages = Array.from(new Set(productImagesList));
-              const activeImgIdx = (activeImageIndexMap[product.id] || 0) % (uniqueImages.length || 1);
-              const currentImgSrc = uniqueImages[activeImgIdx] || product.image;
 
               // Check if product is already in cart
               const cartItem = cartItems?.find(
@@ -792,137 +792,91 @@ export const ShopView: React.FC = () => {
                       : 'bg-white border-slate-200/90 hover:border-amber-400 shadow-xs hover:shadow-amber-500/10'
                   }`}
                 >
-                  {/* Image Container with In-Card Image Flipping & Optimal Aspect Ratio */}
-                  <div
-                    className={`relative aspect-[3/4] sm:aspect-[4/5] w-full overflow-hidden cursor-pointer ${
-                      isDark ? 'bg-[#191919]' : 'bg-slate-50'
-                    }`}
-                    onClick={() => navigateToProduct(product.id)}
-                  >
-                    <Image
-                      src={currentImgSrc}
-                      alt={product.name}
-                      fill
-                      unoptimized
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-108"
-                    />
-
-                    {/* Badge Tags (Top-Start) */}
-                    <div className="absolute top-1.5 left-1.5 rtl:left-auto rtl:right-1.5 z-10 flex flex-col gap-1 items-start">
-                      {product.badge && (
+                  {/* Image Container with In-Card Mobile Touch Swipe & Desktop Flipping */}
+                  <ProductImageSwiper
+                    images={uniqueImages}
+                    alt={product.name}
+                    aspectRatioClassName="aspect-[3/4] sm:aspect-[4/5]"
+                    onCardClick={() => navigateToProduct(product.id)}
+                    isDark={isDark}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    badge={
+                      product.badge ? (
                         <span className="px-1.5 sm:px-2 py-0.5 bg-black/90 border border-[#D4AF37]/50 text-[#D4AF37] font-bold text-[8px] sm:text-[10px] tracking-wider uppercase rounded-md backdrop-blur-sm shadow-md animate-scale-in">
                           {product.badge}
                         </span>
-                      )}
-                      {Boolean(product.discountPrice && product.discountPrice > product.price) && (
+                      ) : null
+                    }
+                    discountBadge={
+                      Boolean(product.discountPrice && product.discountPrice > product.price) ? (
                         <span className="px-1.5 sm:px-2 py-0.5 bg-rose-600 text-white font-bold text-[8px] sm:text-[10px] tracking-wider uppercase rounded-md shadow-md animate-scale-in">
                           -{Math.round(((product.discountPrice! - product.price) / product.discountPrice!) * 100)}%
                         </span>
-                      )}
-                    </div>
-
-                    {/* Wishlist Toggle Heart (Top-End) */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleWishlist(product);
-                      }}
-                      className={`absolute top-1.5 right-1.5 rtl:right-auto rtl:left-1.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer z-10 hover:scale-115 active:scale-90 backdrop-blur-md shadow-xs ${
-                        isWishlisted
-                          ? isDark
-                            ? 'bg-rose-950/80 border border-rose-500/60 text-rose-400'
-                            : 'bg-rose-50 border border-rose-200 text-rose-600'
-                          : isDark
-                          ? 'bg-black/50 border border-white/15 text-white/90 hover:text-rose-400 hover:bg-black/80'
-                          : 'bg-white/90 border border-slate-200/80 text-slate-700 hover:text-rose-500 hover:bg-white'
-                      }`}
-                      title={t.wishlist}
-                    >
-                      <span className={`material-symbols-outlined text-sm sm:text-base transition-transform duration-200 ${isWishlisted ? 'fill scale-110' : ''}`}>
-                        favorite
-                      </span>
-                    </button>
-
-                    {/* Image Flipping Navigation Arrows (Desktop Only) */}
-                    {uniqueImages.length > 1 && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={(e) => handlePrevImage(e, product.id, uniqueImages.length)}
-                          className="hidden sm:flex absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/40 hover:bg-black/90 text-white/80 hover:text-white items-center justify-center transition-all cursor-pointer z-20 opacity-0 group-hover:opacity-100 backdrop-blur-xs"
-                          title="الصورة السابقة"
-                        >
-                          <span className="material-symbols-outlined text-xs">chevron_left</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={(e) => handleNextImage(e, product.id, uniqueImages.length)}
-                          className="hidden sm:flex absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/40 hover:bg-black/90 text-white/80 hover:text-white items-center justify-center transition-all cursor-pointer z-20 opacity-0 group-hover:opacity-100 backdrop-blur-xs"
-                          title="الصورة التالية"
-                        >
-                          <span className="material-symbols-outlined text-xs">chevron_right</span>
-                        </button>
-
-                        {/* Subtle Dots Indicator at Bottom of Image */}
-                        <div className="absolute bottom-1.5 inset-x-0 flex justify-center items-center gap-1 z-10">
-                          {uniqueImages.map((_, dotIdx) => (
-                            <button
-                              key={dotIdx}
-                              type="button"
-                              onClick={(e) => handleSetImageIndex(e, product.id, dotIdx)}
-                              className={`h-1 rounded-full transition-all cursor-pointer ${
-                                activeImgIdx === dotIdx
-                                  ? 'bg-[#D4AF37] w-3 shadow-xs'
-                                  : 'bg-white/50 hover:bg-white/90 w-1'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
-
-                    {/* Desktop Hover Action Overlay */}
-                    <div className="hidden sm:flex absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/85 to-transparent opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 gap-1.5 z-10">
+                      ) : null
+                    }
+                    wishlistButton={
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setZoomProduct(product);
+                          toggleWishlist(product);
                         }}
-                        className="p-1.5 bg-[#1D1D1D] border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] transition-all hover:scale-105 flex items-center justify-center cursor-pointer rounded-lg"
-                        title={t.zoomImage}
-                      >
-                        <span className="material-symbols-outlined text-base">zoom_in</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setQuickViewProduct(product);
-                        }}
-                        className="flex-1 py-1.5 bg-[#1D1D1D] border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] font-button text-[10px] tracking-wider uppercase transition-all hover:scale-[1.02] cursor-pointer rounded-lg font-bold"
-                      >
-                        {t.quickView}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(product);
-                        }}
-                        className={`p-1.5 transition-all flex items-center justify-center cursor-pointer rounded-lg font-bold active:scale-90 ${
-                          isInCart
-                            ? 'bg-[#D4AF37] text-neutral-950 shadow-sm scale-105'
-                            : 'bg-[#1D1D1D] border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] hover:scale-105'
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-115 active:scale-90 backdrop-blur-md shadow-xs ${
+                          isWishlisted
+                            ? isDark
+                              ? 'bg-rose-950/80 border border-rose-500/60 text-rose-400'
+                              : 'bg-rose-50 border border-rose-200 text-rose-600'
+                            : isDark
+                            ? 'bg-black/50 border border-white/15 text-white/90 hover:text-rose-400 hover:bg-black/80'
+                            : 'bg-white/90 border border-slate-200/80 text-slate-700 hover:text-rose-500 hover:bg-white'
                         }`}
-                        title={isInCart ? `مضاف في الحقيبة (${cartQuantity})` : t.addToBag}
+                        title={t.wishlist}
                       >
-                        <span className="material-symbols-outlined text-base">
-                          {isInCart ? 'check' : 'shopping_bag'}
+                        <span className={`material-symbols-outlined text-sm sm:text-base transition-transform duration-200 ${isWishlisted ? 'fill scale-110' : ''}`}>
+                          favorite
                         </span>
                       </button>
-                    </div>
-                  </div>
+                    }
+                    hoverOverlay={
+                      <div className="hidden sm:flex absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/85 to-transparent opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 gap-1.5 z-10">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setZoomProduct(product);
+                          }}
+                          className="p-1.5 bg-[#1D1D1D] border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] transition-all hover:scale-105 flex items-center justify-center cursor-pointer rounded-lg"
+                          title={t.zoomImage}
+                        >
+                          <span className="material-symbols-outlined text-base">zoom_in</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setQuickViewProduct(product);
+                          }}
+                          className="flex-1 py-1.5 bg-[#1D1D1D] border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] font-button text-[10px] tracking-wider uppercase transition-all hover:scale-[1.02] cursor-pointer rounded-lg font-bold"
+                        >
+                          {t.quickView}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                          }}
+                          className={`p-1.5 transition-all flex items-center justify-center cursor-pointer rounded-lg font-bold active:scale-90 ${
+                            isInCart
+                              ? 'bg-[#D4AF37] text-neutral-950 shadow-sm scale-105'
+                              : 'bg-[#1D1D1D] border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A0A0A] hover:scale-105'
+                          }`}
+                          title={isInCart ? `مضاف في الحقيبة (${cartQuantity})` : t.addToBag}
+                        >
+                          <span className="material-symbols-outlined text-base">
+                            {isInCart ? 'check' : 'shopping_bag'}
+                          </span>
+                        </button>
+                      </div>
+                    }
+                  />
 
                   {/* Product Card Details (Clear & High Contrast) */}
                   <div className="p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 flex-1 flex flex-col justify-between">
