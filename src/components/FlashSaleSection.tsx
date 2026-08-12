@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useApp } from '../context/AppContext';
 import { Product } from '../types';
+import { ProductImageSwiper } from './ui/ProductImageSwiper';
 
 interface FlashSaleSectionProps {
   flashSale?: {
@@ -16,11 +17,13 @@ interface FlashSaleSectionProps {
 }
 
 export const FlashSaleSection: React.FC<FlashSaleSectionProps> = ({ flashSale }) => {
-  const { lang, addToCart, setQuickViewProduct } = useApp();
+  const router = useRouter();
+  const { lang, addToCart, setQuickViewProduct, theme } = useApp();
 
   const products = flashSale?.products || [];
   const title = flashSale?.title || (lang === 'ar' ? 'عروض التصفية الخاطفة - FLASH SALE' : 'FLASH SALE - LIMITED EDITION');
   const endDate = flashSale?.endDate;
+  const isDark = theme === 'dark';
 
   const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
 
@@ -51,7 +54,7 @@ export const FlashSaleSection: React.FC<FlashSaleSectionProps> = ({ flashSale })
       } else {
         setTimeLeft({
           hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60 * 60)),
           seconds: Math.floor((diff % (1000 * 60)) / 1000),
         });
       }
@@ -107,63 +110,64 @@ export const FlashSaleSection: React.FC<FlashSaleSectionProps> = ({ flashSale })
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.slice(0, 4).map((product) => {
             const prodId = product.id || (product as any)._id;
-            const imageSrc =
-              typeof product.image === 'string'
-                ? product.image
-                : (product as any).thumbnail?.url || (product as any).images?.[0]?.url || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&q=80';
+
+            const productImagesList: string[] = [
+              product.image,
+              ...(product.secondaryImages || []),
+              ...((product as any).images || []).map((img: any) => (typeof img === 'string' ? img : img?.url)),
+              ...(product.colors || []).map((c: any) => c?.image),
+            ].filter((img): img is string => typeof img === 'string' && img.trim() !== '');
+
+            const uniqueImages = Array.from(new Set(productImagesList));
 
             return (
               <div
                 key={prodId}
                 className="group relative bg-[#181818] border border-neutral-700/80 hover:border-[#D4AF37] transition-all duration-300 rounded-xl flex flex-col overflow-hidden shadow-lg hover:shadow-2xl"
               >
-                {/* Product Image Link */}
-                <Link
-                  href={`/product/${prodId}`}
-                  className="relative h-64 w-full bg-[#0D0D0D] overflow-hidden block cursor-pointer"
-                >
-                  <Image
-                    src={imageSrc}
-                    alt={product.name}
-                    fill
-                    unoptimized
-                    className="object-cover object-center group-hover:scale-108 transition-transform duration-700"
-                  />
-                  {product.badge && (
-                    <span className="absolute top-3 left-3 rtl:left-auto rtl:right-3 px-2.5 py-1 bg-[#D4AF37] text-neutral-950 font-button text-[10px] font-bold uppercase tracking-wider rounded-sm z-10 shadow-md">
-                      {product.badge}
-                    </span>
-                  )}
-                  {/* Action Buttons overlay */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setQuickViewProduct(product);
-                      }}
-                      className="w-10 h-10 rounded-full bg-black/85 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
-                      title="Quick View"
-                      aria-label="Quick view"
-                    >
-                      <span className="material-symbols-outlined text-lg">visibility</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addToCart(product);
-                      }}
-                      className="w-10 h-10 rounded-full bg-[#D4AF37] text-black hover:bg-[#E5C158] flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
-                      title="Add to Cart"
-                      aria-label="Add to cart"
-                    >
-                      <span className="material-symbols-outlined text-lg font-bold">shopping_bag</span>
-                    </button>
-                  </div>
-                </Link>
+                {/* Product Image with Touch Swiping */}
+                <ProductImageSwiper
+                  images={uniqueImages}
+                  alt={product.name}
+                  aspectRatioClassName="h-64 w-full"
+                  onCardClick={() => router.push(`/product/${prodId}`)}
+                  isDark={isDark}
+                  badge={
+                    product.badge ? (
+                      <span className="px-2.5 py-1 bg-[#D4AF37] text-neutral-950 font-button text-[10px] font-bold uppercase tracking-wider rounded-sm shadow-md">
+                        {product.badge}
+                      </span>
+                    ) : null
+                  }
+                  hoverOverlay={
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setQuickViewProduct(product);
+                        }}
+                        className="w-10 h-10 rounded-full bg-black/85 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
+                        title="Quick View"
+                        aria-label="Quick view"
+                      >
+                        <span className="material-symbols-outlined text-lg">visibility</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(product);
+                        }}
+                        className="w-10 h-10 rounded-full bg-[#D4AF37] text-black hover:bg-[#E5C158] flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
+                        title="Add to Cart"
+                        aria-label="Add to cart"
+                      >
+                        <span className="material-symbols-outlined text-lg font-bold">shopping_bag</span>
+                      </button>
+                    </div>
+                  }
+                />
 
                 {/* Product Details */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3 text-white">
