@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Product } from '../types';
+import { ProductImageSwiper } from './ui/ProductImageSwiper';
 import { useApp } from '../context/AppContext';
 import { api } from '../lib/api';
 
@@ -448,12 +449,18 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
     const isCardWishlisted = wishlistIds.includes(pId);
     const cardCartItem = cartItems.find((item) => String(item.product.id || (item.product as any)._id) === pId);
     const isCardInCart = Boolean(cardCartItem);
-    const imgUrl = typeof p.image === 'string' ? p.image : 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600';
     const pSarPrice = Math.round((p.price || 0) * 3.75);
 
-    const handleNavigate = (e: React.MouseEvent) => {
-      // Prevent double trigger if clicking directly on an anchor
-      if ((e.target as HTMLElement).closest('button')) return;
+    const productImagesList: string[] = [
+      p.image,
+      ...(p.secondaryImages || []),
+      ...((p as any).images || []).map((img: any) => (typeof img === 'string' ? img : img?.url)),
+      ...(p.colors || []).map((c: any) => c?.image),
+    ].filter((img): img is string => typeof img === 'string' && img.trim() !== '');
+
+    const uniqueImages = Array.from(new Set(productImagesList));
+
+    const handleNavigate = () => {
       router.push(`/product/${pId}`);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -463,91 +470,78 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
     return (
       <div
         key={pId}
-        onClick={handleNavigate}
         className="group relative flex-none w-[200px] xs:w-[230px] sm:w-auto snap-start bg-white dark:bg-[#131313] rounded-2xl border border-neutral-200/90 dark:border-neutral-800/80 hover:border-[#D4AF37] dark:hover:border-[#D4AF37] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer"
       >
-        {/* Card Image Area */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900">
-          <Link
-            href={`/product/${pId}`}
-            onClick={(e) => {
-              if (typeof window !== 'undefined') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
-            className="block w-full h-full"
-          >
-            <Image
-              src={imgUrl}
-              alt={p.name}
-              fill
-              unoptimized
-              className="object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
-            />
-          </Link>
-
-          {/* Badge */}
-          {p.badge && (
-            <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 bg-[#D4AF37] text-neutral-950 text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md z-10">
-              {p.badge}
-            </span>
-          )}
-
-          {/* Top-Left Wishlist Heart Toggle */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleWishlist(p);
-            }}
-            className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 backdrop-blur-md shadow-md ${
-              isCardWishlisted
-                ? 'bg-rose-600 text-white'
-                : 'bg-white/90 dark:bg-black/70 text-neutral-700 dark:text-neutral-300 hover:text-rose-600 hover:bg-white'
-            }`}
-            title={isCardWishlisted ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
-            aria-label="Wishlist"
-          >
-            <span className="material-symbols-outlined text-base">
-              {isCardWishlisted ? 'favorite' : 'favorite_border'}
-            </span>
-          </button>
-
-          {/* Desktop Hover Quick Actions Overlay */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center gap-2.5 backdrop-blur-[2px]">
+        {/* Card Image Area with Touch Swiping */}
+        <ProductImageSwiper
+          images={uniqueImages}
+          alt={p.name}
+          aspectRatioClassName="aspect-[4/5] w-full"
+          onCardClick={handleNavigate}
+          isDark={isDark}
+          badge={
+            p.badge ? (
+              <span className="px-2.5 py-0.5 bg-[#D4AF37] text-neutral-950 text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md">
+                {p.badge}
+              </span>
+            ) : null
+          }
+          wishlistButton={
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                setQuickViewProduct(p);
+                toggleWishlist(p);
               }}
-              className="w-10 h-10 rounded-full bg-white/95 dark:bg-black/95 text-neutral-800 dark:text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-110"
-              title="نظرة سريعة"
-              aria-label="Quick View"
-            >
-              <span className="material-symbols-outlined text-lg">visibility</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(p);
-              }}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-110 ${
-                isCardInCart
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-[#D4AF37] text-neutral-950 hover:bg-[#E5C158]'
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer backdrop-blur-md shadow-md ${
+                isCardWishlisted
+                  ? 'bg-rose-600 text-white'
+                  : 'bg-white/90 dark:bg-black/70 text-neutral-700 dark:text-neutral-300 hover:text-rose-600 hover:bg-white'
               }`}
-              title={isCardInCart ? 'في السلة' : 'إضافة إلى السلة'}
-              aria-label="Add to cart"
+              title={isCardWishlisted ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
+              aria-label="Wishlist"
             >
-              <span className="material-symbols-outlined text-lg font-bold">
-                {isCardInCart ? 'check' : 'shopping_bag'}
+              <span className="material-symbols-outlined text-base">
+                {isCardWishlisted ? 'favorite' : 'favorite_border'}
               </span>
             </button>
-          </div>
-        </div>
+          }
+          hoverOverlay={
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center gap-2.5 backdrop-blur-[2px]">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setQuickViewProduct(p);
+                }}
+                className="w-10 h-10 rounded-full bg-white/95 dark:bg-black/95 text-neutral-800 dark:text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-110"
+                title="نظرة سريعة"
+                aria-label="Quick View"
+              >
+                <span className="material-symbols-outlined text-lg">visibility</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart(p);
+                }}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-110 ${
+                  isCardInCart
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-[#D4AF37] text-neutral-950 hover:bg-[#E5C158]'
+                }`}
+                title={isCardInCart ? 'في السلة' : 'إضافة إلى السلة'}
+                aria-label="Add to cart"
+              >
+                <span className="material-symbols-outlined text-lg font-bold">
+                  {isCardInCart ? 'check' : 'shopping_bag'}
+                </span>
+              </button>
+            </div>
+          }
+        />
 
         {/* Card Info Area */}
         <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1 space-y-2">
