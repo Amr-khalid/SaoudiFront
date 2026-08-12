@@ -2,9 +2,10 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useApp } from '../context/AppContext';
 import { Product } from '../types';
+import { ProductImageSwiper } from './ui/ProductImageSwiper';
 
 interface ProductsCarouselProps {
   title: string;
@@ -19,8 +20,10 @@ export const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
   products,
   viewAllLink = '/shop',
 }) => {
-  const { lang, addToCart, setQuickViewProduct } = useApp();
+  const router = useRouter();
+  const { lang, addToCart, setQuickViewProduct, theme } = useApp();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -81,64 +84,64 @@ export const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
       >
         {products.map((product) => {
           const prodId = product.id || (product as any)._id;
-          const imageSrc =
-            typeof product.image === 'string'
-              ? product.image
-              : (product as any).thumbnail?.url || (product as any).images?.[0]?.url || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&q=80';
+
+          const productImagesList: string[] = [
+            product.image,
+            ...(product.secondaryImages || []),
+            ...((product as any).images || []).map((img: any) => (typeof img === 'string' ? img : img?.url)),
+            ...(product.colors || []).map((c: any) => c?.image),
+          ].filter((img): img is string => typeof img === 'string' && img.trim() !== '');
+
+          const uniqueImages = Array.from(new Set(productImagesList));
 
           return (
             <div
               key={prodId}
               className="flex-none w-[285px] sm:w-[325px] snap-start group bg-white dark:bg-[#141414] border border-slate-200 dark:border-[#262626] hover:border-[#B8860B] dark:hover:border-[#D4AF37] transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_35px_rgba(184,134,11,0.12)]"
             >
-              {/* Product Image Box - Clickable Link to Product Page */}
-              <Link
-                href={`/product/${prodId}`}
-                className="relative h-80 w-full bg-slate-50 dark:bg-[#0A0A0A] overflow-hidden block cursor-pointer"
-              >
-                <Image
-                  src={imageSrc}
-                  alt={product.name}
-                  fill
-                  unoptimized
-                  className="object-cover object-center group-hover:scale-108 transition-transform duration-700"
-                />
-                {product.badge && (
-                  <span className="absolute top-3 left-3 rtl:left-auto rtl:right-3 px-3 py-1 bg-[#D4AF37] text-neutral-950 font-button text-[10px] font-bold uppercase tracking-widest rounded-md shadow-md z-10">
-                    {product.badge}
-                  </span>
-                )}
-
-                {/* Hover overlay actions */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setQuickViewProduct(product);
-                    }}
-                    className="w-11 h-11 rounded-full bg-black/85 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
-                    title="Quick View"
-                    aria-label="Quick View Product"
-                  >
-                    <span className="material-symbols-outlined text-lg">visibility</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      addToCart(product);
-                    }}
-                    className="w-11 h-11 rounded-full bg-[#D4AF37] text-black hover:bg-[#E5C158] flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
-                    title="Add to Cart"
-                    aria-label="Add product to cart"
-                  >
-                    <span className="material-symbols-outlined text-lg font-bold">shopping_bag</span>
-                  </button>
-                </div>
-              </Link>
+              {/* Product Image Box with Touch Swiping and Desktop Chevrons */}
+              <ProductImageSwiper
+                images={uniqueImages}
+                alt={product.name}
+                aspectRatioClassName="h-80 w-full"
+                onCardClick={() => router.push(`/product/${prodId}`)}
+                isDark={isDark}
+                badge={
+                  product.badge ? (
+                    <span className="px-3 py-1 bg-[#D4AF37] text-neutral-950 font-button text-[10px] font-bold uppercase tracking-widest rounded-md shadow-md">
+                      {product.badge}
+                    </span>
+                  ) : null
+                }
+                hoverOverlay={
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setQuickViewProduct(product);
+                      }}
+                      className="w-11 h-11 rounded-full bg-black/85 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
+                      title="Quick View"
+                      aria-label="Quick View Product"
+                    >
+                      <span className="material-symbols-outlined text-lg">visibility</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product);
+                      }}
+                      className="w-11 h-11 rounded-full bg-[#D4AF37] text-black hover:bg-[#E5C158] flex items-center justify-center transition-all cursor-pointer shadow-xl hover:scale-110"
+                      title="Add to Cart"
+                      aria-label="Add product to cart"
+                    >
+                      <span className="material-symbols-outlined text-lg font-bold">shopping_bag</span>
+                    </button>
+                  </div>
+                }
+              />
 
               {/* Info */}
               <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
